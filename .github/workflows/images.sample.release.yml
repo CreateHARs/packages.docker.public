@@ -42,4 +42,4 @@ jobs:
           context : ./images/sample
           file    : Dockerfile
           push    : true
-          tags    : ${{ env.REGISTRY }}/${{ lowercase(github.repository_owner) }}/${{ lowercase(github.event.repository.name) }}:${{ env.IMAGE_TAG }}
+          tags    : ${{ env.REGISTRY }}/${{ github.repository_owner.lowercase }}/${{ github.event.repository.name.lowercase }}:${{ env.IMAGE_TAG }}
