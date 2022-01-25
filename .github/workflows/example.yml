@@ -4,9 +4,9 @@ on:
   workflow_dispatch
 
 jobs:
-  name: confirm context
   main:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        run : echo "$GITHUB_CONTEXT"
+    name    : confirm context
+    runs-on : ubuntu-latest
+    steps   :
+      - name  : Checkout repository
+        run   : echo "$GITHUB_CONTEXT"
