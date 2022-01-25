@@ -1,0 +1,45 @@
+name: [Docker image] sample - release
+
+on:
+  push:
+    branches:
+      - 'images/sample/releases/**'
+
+env:
+  REGISTRY   : ghcr.io
+
+jobs:
+  build-and-push-image:
+    name    : Build => Push to ghcr.io
+    runs-on : ubuntu-latest
+    steps   :
+      - name  : env
+        env   :
+          GITHUB_CONTEXT : ${{ toJson(github) }}
+          github_ref : ${{ github.ref }}
+        run   : |
+          echo "$GITHUB_CONTEXT"
+
+          branch="${github_ref/refs\/heads\//}"
+          echo $branch
+          version="${branch/images\/sample\/releases\//}"
+          echo $version
+          echo "::set-env name=IMAGE_TAG::$version"
+
+      - name  : Checkout repository
+        uses  : actions/checkout@v2
+
+      - name  : Log in to the Container registry
+        uses  : docker/login-action@v1
+        with  :
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name  : Build and push Docker image
+        uses  : docker/build-push-action@v2
+        with  :
+          context : ./images/sample
+          file    : Dockerfile
+          push    : true
+          tags    : ${{ env.REGISTRY }}/${{ lowercase(github.repository_owner) }}/${{ lowercase(github.event.repository.name) }}:${{ env.IMAGE_TAG }}
