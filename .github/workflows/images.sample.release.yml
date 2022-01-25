@@ -17,6 +17,8 @@ jobs:
         env   :
           GITHUB_CONTEXT : ${{ toJson(github) }}
           github_ref : ${{ github.ref }}
+          repo_owner : ${{ github.repository_owner }}
+          repo_name  : ${{ github.event.repository.name }}
         run   : |
           echo "$GITHUB_CONTEXT"
 
@@ -25,6 +27,9 @@ jobs:
           version="${branch/images\/sample\/releases\//}"
           echo $version
           echo "IMAGE_TAG=$version" >> $GITHUB_ENV
+
+          echo "REPO_OWNER_LOWERCASE=${repo_owner,,}" >>${GITHUB_ENV}
+          echo "REPO_NAME_LOWERCASE=${repo_name,,}" >>${GITHUB_ENV}
 
       - name  : Checkout repository
         uses  : actions/checkout@v2
@@ -42,4 +47,4 @@ jobs:
           context : ./images/sample
           file    : Dockerfile
           push    : true
-          tags    : ${{ env.REGISTRY }}/${{ github.repository_owner.lowercase }}/${{ github.event.repository.name.lowercase }}:${{ env.IMAGE_TAG }}
+          tags    : ${{ env.REGISTRY }}/${{ env.REPO_OWNER_LOWERCASE }}/${{ env.REPO_NAME_LOWERCASE }}/sample:${{ env.IMAGE_TAG }}
