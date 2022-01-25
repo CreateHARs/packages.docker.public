@@ -47,4 +47,4 @@ jobs:
           context : ./images/sample
           # file    : Dockerfile
           push    : true
-          tags    : ${{ env.REGISTRY }}/${{ env.REPO_OWNER_LOWERCASE }}/${{ env.REPO_NAME_LOWERCASE }}/sample:${{ env.IMAGE_TAG }}
+          tags    : ${{ env.REGISTRY }}/${{ env.REPO_OWNER_LOWERCASE }}/${{ env.REPO_NAME_LOWERCASE }}/sample2:${{ env.IMAGE_TAG }}
