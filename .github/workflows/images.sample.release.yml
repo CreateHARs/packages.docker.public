@@ -1,4 +1,4 @@
-name: "[Docker image] sample - release"
+name: "[release] image : sample"
 
 on:
   push:
@@ -24,7 +24,7 @@ jobs:
           echo $branch
           version="${branch/images\/sample\/releases\//}"
           echo $version
-          echo "::set-env name=IMAGE_TAG::$version"
+          echo "IMAGE_TAG=$version" >> $GITHUB_ENV
 
       - name  : Checkout repository
         uses  : actions/checkout@v2
