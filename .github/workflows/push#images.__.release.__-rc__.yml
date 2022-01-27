@@ -3,8 +3,7 @@ name: "[release] image : rc"
 on:
   push:
     branches:
-      - 'images/*/releases/*-rc' # - 'images/*/releases/*-rc*' # rc 以下は workflow 内で生成する。
-
+      - 'images/*/releases/*-rc'   # - 'images/*/releases/*-rc*' # rc 以下は workflow 内で生成する。
 
 env:
   REGISTRY   : ghcr.io
