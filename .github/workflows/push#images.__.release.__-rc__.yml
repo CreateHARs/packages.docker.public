@@ -3,7 +3,8 @@ name: "[release] image : rc"
 on:
   push:
     branches:
-      - 'images/*/releases/*-rc*'
+      - 'images/*/releases/*-rc' # - 'images/*/releases/*-rc*' # rc 以下は workflow 内で生成する。
+
 
 env:
   REGISTRY   : ghcr.io
@@ -30,9 +31,12 @@ jobs:
           
           version="${branch/images\/$image\/releases\//}"
           echo "version : $version"
+          
+          datetime=$(TZ=UTC-9 date +'%Y-%m-%d.%H-%M-%S')
+          echo "datetime : $datetime"
 
           echo "IMAGE_NAME=$image" >> $GITHUB_ENV
-          echo "IMAGE_TAG=$version" >> $GITHUB_ENV
+          echo "IMAGE_TAG=$version.$datetime" >> $GITHUB_ENV
           echo "REPO_OWNER_LOWERCASE=${repo_owner,,}" >> ${GITHUB_ENV}
           echo "REPO_NAME_LOWERCASE=${repo_name,,}" >> ${GITHUB_ENV}
 
