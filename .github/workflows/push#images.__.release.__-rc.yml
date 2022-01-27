@@ -20,16 +20,16 @@ jobs:
           repo_owner : ${{ github.repository_owner }}
           repo_name  : ${{ github.event.repository.name }}
         run   : |
-          echo "$GITHUB_CONTEXT"
+          echo "GITHUB_CONTEXT : $GITHUB_CONTEXT"
 
           branch="${github_ref/refs\/heads\//}"
-          echo $branch
+          echo "branch : $$branch"
 
-          image="$(cut -d '_' -f 2 <<< $branch)"
-          echo $image
+          image="$(cut -d '/' -f 2 <<< $branch)"
+          echo "image : $image"
           
           version="${branch/images\/$image\/releases\//}"
-          echo $version
+          echo "version : $version"
 
           echo "IMAGE_NAME=$image" >> $GITHUB_ENV
           echo "IMAGE_TAG=$version" >> $GITHUB_ENV
