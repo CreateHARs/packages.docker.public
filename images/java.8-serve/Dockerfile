@@ -7,5 +7,3 @@ RUN apk --update add tzdata && \
 
 RUN grep '^networkaddress.cache.ttl=' /usr/lib/jvm/java-1.8-openjdk/jre/lib/security/java.security || echo 'networkaddress.cache.ttl=10' >> /usr/lib/jvm/java-1.8-openjdk/jre/lib/security/java.security
 RUN grep '^networkaddress.cache.negative.ttl=' /usr/lib/jvm/java-1.8-openjdk/jre/lib/security/java.security || sed -i -e '/networkaddress\.cache\.negative\.ttl\=10/d' /usr/lib/jvm/java-1.8-openjdk/jre/lib/security/java.security | echo 'networkaddress.cache.negative.ttl=0' >> /usr/lib/jvm/java-1.8-openjdk/jre/lib/security/java.security
-
-å
