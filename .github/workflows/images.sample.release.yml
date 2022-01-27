@@ -3,7 +3,7 @@ name: "[release] image : sample"
 on:
   push:
     branches:
-      - 'xxxxx-close-xxxxx' '# - 'images/sample/releases/**' # push#images.__.release.__-rc__.yml に移行
+      - 'xxxxx-close-xxxxx' # - 'images/sample/releases/**' # push#images.__.release.__-rc__.yml に移行
 
 env:
   REGISTRY   : ghcr.io
