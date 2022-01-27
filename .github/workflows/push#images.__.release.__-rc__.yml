@@ -3,7 +3,7 @@ name: "[release] image : rc"
 on:
   push:
     branches:
-      - 'images/*/releases/*-rc'
+      - 'images/*/releases/*-rc*'
 
 env:
   REGISTRY   : ghcr.io
