@@ -50,6 +50,21 @@ jobs:
           echo "IMAGE_TAG=$image_tag" >> $GITHUB_ENV
           echo "GIT_TAG=$git_tag"     >> $GITHUB_ENV
 
+      - name  : Check tag exists
+        env   :
+          REPO_OWNER     : ${{ github.repository_owner }}
+          REPO_NAME      : ${{ github.event.repository.name }}
+        run   : |
+          CODE=`curl --write-out '%{http_code}' \
+                     --request GET "https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/git/ref/tags/${GIT_TAG}"`
+          echo "\n"
+          echo "http_code : $CODE"
+          if [[ $CODE == "200" ]] 
+          then 
+            echo "tag '${GIT_TAG}' is already exists."
+            exit 9
+          fi
+
       - name  : Checkout repository
         uses  : actions/checkout@v2
 
