@@ -33,7 +33,7 @@ jobs:
           echo "image : $image"
           
           version_rc="${branch/images\/$image\/releases\//}"
-          version="${version}.${datetime}"
+          version="${version_rc}.${datetime}"
           echo "version_rc : $version_rc"
           echo "version    : $version"
           
