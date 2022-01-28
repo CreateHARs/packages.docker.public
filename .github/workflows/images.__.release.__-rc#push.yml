@@ -23,25 +23,27 @@ jobs:
         run   : |
           echo "GITHUB_CONTEXT : $GITHUB_CONTEXT"
 
+          datetime=$(TZ=UTC-9 date +'%Y-%m-%d.%H-%M-%S')
+          echo "datetime : $datetime"
+
           branch="${GITHUB_REF/refs\/heads\//}"
           echo "branch : $$branch"
 
           image="$(cut -d '/' -f 2 <<< $branch)"
           echo "image : $image"
           
-          version="${branch/images\/$image\/releases\//}"
-          echo "version : $version"
-          
-          datetime=$(TZ=UTC-9 date +'%Y-%m-%d.%H-%M-%S')
-          echo "datetime : $datetime"
+          version_rc="${branch/images\/$image\/releases\//}"
+          version="${version}.${datetime}"
+          echo "version_rc : $version_rc"
+          echo "version    : $version"
           
           repo_owner_lowercase=${REPO_OWNER,,}
           repo_name_lowercase=${REPO_NAME,,}
 
-          image_tag=${REGISTRY}/${repo_owner_lowercase}/${repo_name_lowercase}/${image}:${$version.$datetime}
+          image_tag="${REGISTRY}/${repo_owner_lowercase}/${repo_name_lowercase}/${image}:${$version}"
           echo "image_tag : $image_tag"
 
-          git_tag=${image}:${$version.$datetime}
+          git_tag="${image}:${$version}"
           echo "git_tag : $git_tag"
 
           echo "IMAGE_NAME=$image"    >> $GITHUB_ENV
