@@ -19,6 +19,7 @@ jobs:
           GITHUB_REF     : ${{ github.ref }}
           REPO_OWNER     : ${{ github.repository_owner }}
           REPO_NAME      : ${{ github.event.repository.name }}
+          REGISTRY       : ${{ env.REGISTRY }}
         run   : |
           echo "GITHUB_CONTEXT : $GITHUB_CONTEXT"
 
@@ -33,11 +34,19 @@ jobs:
           
           datetime=$(TZ=UTC-9 date +'%Y-%m-%d.%H-%M-%S')
           echo "datetime : $datetime"
+          
+          repo_owner_lowercase=${REPO_OWNER,,}
+          repo_name_lowercase=${REPO_NAME,,}
 
-          echo "IMAGE_NAME=$image" >> $GITHUB_ENV
-          echo "IMAGE_TAG=$version.$datetime" >> $GITHUB_ENV
-          echo "REPO_OWNER_LOWERCASE=${REPO_OWNER,,}" >> ${GITHUB_ENV}
-          echo "REPO_NAME_LOWERCASE=${REPO_NAME,,}" >> ${GITHUB_ENV}
+          image_tag=${REGISTRY}/${repo_owner_lowercase}/${repo_name_lowercase}/${image}:${$version.$datetime}
+          echo "image_tag : $image_tag"
+
+          git_tag=${image}:${$version.$datetime}
+          echo "git_tag : $git_tag"
+
+          echo "IMAGE_NAME=$image"    >> $GITHUB_ENV
+          echo "IMAGE_TAG=$image_tag" >> $GITHUB_ENV
+          echo "GIT_TAG=$git_tag"     >> $GITHUB_ENV
 
       - name  : Checkout repository
         uses  : actions/checkout@v2
@@ -55,9 +64,9 @@ jobs:
           context : ./images/${{ env.IMAGE_NAME }}
           # file    : Dockerfile
           push    : true
-          tags    : ${{ env.REGISTRY }}/${{ env.REPO_OWNER_LOWERCASE }}/${{ env.REPO_NAME_LOWERCASE }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          tags    : ${{ env.IMAGE_TAG }}
 
       - name  : Tag branch
         run   : |
-          git tag         ${{ env.IMAGE_NAME }}@${{ env.IMAGE_TAG }}
-          git push origin ${{ env.IMAGE_NAME }}@${{ env.IMAGE_TAG }}
+          git tag         ${{ env.GIT_TAG }}
+          git push origin ${{ env.GIT_TAG }}
