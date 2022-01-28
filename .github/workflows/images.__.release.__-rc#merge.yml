@@ -63,7 +63,10 @@ jobs:
           REPO_OWNER     : ${{ github.repository_owner }}
           REPO_NAME      : ${{ github.event.repository.name }}
         run   : |
-          CODE=curl --request GET "https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/git/ref/tags/${GIT_TAG}"
+          CODE=`curl --write-out '%{http_code}' \
+                     --silent \
+                     --output /dev/null \
+                     --request GET "https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/git/ref/tags/${GIT_TAG}"`
           echo $CODE
           if [ $CODE!="200" ] 
           then 
