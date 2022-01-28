@@ -1,0 +1,58 @@
+name: "[release] image : official"
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
+env:
+  REGISTRY   : ghcr.io
+
+jobs:
+  build-and-push-image:
+    name    : Build => Push to ghcr.io
+    # if 文で正規表現 ( 'images/*/releases/*-rc' ) が使えない為、やや緩めの判定で妥協。
+    if      : |
+      github.event.pull_request.merged == true && 
+      startsWith(github.event.pull_request.head.ref, 'images/') &&
+      contains(github.event.pull_request.head.ref, '/releases/') &&
+      endsWith(github.event.pull_request.head.ref, '-rc')
+    runs-on : ubuntu-latest
+    steps   :
+      - name  : env
+        env   :
+          GITHUB_CONTEXT : ${{ toJson(github) }}
+          MERGED_BRANCH  : ${{ github.event.pull_request.head.ref }}
+        run   : |
+          echo "GITHUB_CONTEXT : $GITHUB_CONTEXT"
+
+          branch="${MERGED_BRANCH}"
+          echo "branch : $$branch"
+
+          image="$(cut -d '/' -f 2 <<< $branch)"
+          echo "image : $image"
+          
+          version_rc="${branch/images\/$image\/releases\//}"
+          version="${version_rc%-}"
+          echo "version_rc : $version_rc"
+          echo "version    : $version"
+
+          echo "IMAGE_NAME=$image" >> $GITHUB_ENV
+          echo "IMAGE_TAG=$version" >> $GITHUB_ENV
+          echo "REPO_OWNER_LOWERCASE=${repo_owner,,}" >> ${GITHUB_ENV}
+          echo "REPO_NAME_LOWERCASE=${repo_name,,}" >> ${GITHUB_ENV}    
+
+
+#on:
+#  release:
+#    types:
+#      - published
+#
+#jobs:
+#   build-and-push-image:
+#     name    : Build => Push to ghcr.io
+#     runs-on : ubuntu-latest
+#     steps   :
+
