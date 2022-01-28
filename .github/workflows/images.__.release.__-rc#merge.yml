@@ -67,7 +67,7 @@ jobs:
                      --request GET "https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/git/ref/tags/${GIT_TAG}"`
           echo "\n"
           echo "http_code : $CODE"
-          if [[ $CODE == "200" ]] 
+          if [[ $CODE == 200 ]] 
           then 
             echo "tag '${GIT_TAG}' is already exists."
             exit 9
