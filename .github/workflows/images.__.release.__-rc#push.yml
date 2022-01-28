@@ -16,13 +16,13 @@ jobs:
       - name  : env
         env   :
           GITHUB_CONTEXT : ${{ toJson(github) }}
-          github_ref : ${{ github.ref }}
-          repo_owner : ${{ github.repository_owner }}
-          repo_name  : ${{ github.event.repository.name }}
+          GITHUB_REF     : ${{ github.ref }}
+          REPO_OWNER     : ${{ github.repository_owner }}
+          REPO_NAME      : ${{ github.event.repository.name }}
         run   : |
           echo "GITHUB_CONTEXT : $GITHUB_CONTEXT"
 
-          branch="${github_ref/refs\/heads\//}"
+          branch="${GITHUB_REF/refs\/heads\//}"
           echo "branch : $$branch"
 
           image="$(cut -d '/' -f 2 <<< $branch)"
@@ -36,8 +36,8 @@ jobs:
 
           echo "IMAGE_NAME=$image" >> $GITHUB_ENV
           echo "IMAGE_TAG=$version.$datetime" >> $GITHUB_ENV
-          echo "REPO_OWNER_LOWERCASE=${repo_owner,,}" >> ${GITHUB_ENV}
-          echo "REPO_NAME_LOWERCASE=${repo_name,,}" >> ${GITHUB_ENV}
+          echo "REPO_OWNER_LOWERCASE=${REPO_OWNER,,}" >> ${GITHUB_ENV}
+          echo "REPO_NAME_LOWERCASE=${REPO_NAME,,}" >> ${GITHUB_ENV}
 
       - name  : Checkout repository
         uses  : actions/checkout@v2

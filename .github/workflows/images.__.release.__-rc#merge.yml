@@ -25,6 +25,8 @@ jobs:
         env   :
           GITHUB_CONTEXT : ${{ toJson(github) }}
           MERGED_BRANCH  : ${{ github.event.pull_request.head.ref }}
+          REPO_OWNER     : ${{ github.repository_owner }}
+          REPO_NAME      : ${{ github.event.repository.name }}
         run   : |
           echo "GITHUB_CONTEXT : $GITHUB_CONTEXT"
 
@@ -38,10 +40,6 @@ jobs:
           version="${version_rc%-*}"
           echo "version_rc : $version_rc"
           echo "version    : $version"
-
-          # 注 : push 時と格納変数名が違うので wrap
-          repo_owner="${repository_owner}"
-          repo_name="${repository/$repo_owner\//}"
 
           echo "IMAGE_NAME=$image" >> $GITHUB_ENV
           echo "IMAGE_TAG=$version" >> $GITHUB_ENV
