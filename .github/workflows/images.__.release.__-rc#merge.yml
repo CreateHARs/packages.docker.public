@@ -69,8 +69,8 @@ jobs:
         env   :
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with  :
-          tag_name     :         ${{ env.REGISTRY }}/${{ env.REPO_OWNER_LOWERCASE }}/${{ env.REPO_NAME_LOWERCASE }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
-          release_name : release ${{ env.REGISTRY }}/${{ env.REPO_OWNER_LOWERCASE }}/${{ env.REPO_NAME_LOWERCASE }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          tag_name     :         ${{ env.IMAGE_NAME }}@${{ env.IMAGE_TAG }}
+          release_name : release ${{ env.IMAGE_NAME }}@${{ env.IMAGE_TAG }}
           body         : |
             ## CHANGELOG
             - commits url : ${{ github.event.pull_request.commits_url }}
