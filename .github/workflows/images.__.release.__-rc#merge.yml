@@ -39,6 +39,10 @@ jobs:
           echo "version_rc : $version_rc"
           echo "version    : $version"
 
+          # 注 : push 時と格納変数名が違うので wrap
+          repo_owner="${repository_owner}"
+          repo_name="${repository/$repo_owner\//}"
+
           echo "IMAGE_NAME=$image" >> $GITHUB_ENV
           echo "IMAGE_TAG=$version" >> $GITHUB_ENV
           echo "REPO_OWNER_LOWERCASE=${repo_owner,,}" >> ${GITHUB_ENV}
