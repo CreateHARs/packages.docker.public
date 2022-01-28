@@ -51,7 +51,7 @@ jobs:
           image_tag="${REGISTRY}/${repo_owner_lowercase}/${repo_name_lowercase}/${image}:${version}"
           echo "image_tag : $image_tag"
 
-          git_tag="${image}:${version}"
+          git_tag="${image}@${version}"
           echo "git_tag : $git_tag"
 
           echo "IMAGE_NAME=$image"    >> $GITHUB_ENV
