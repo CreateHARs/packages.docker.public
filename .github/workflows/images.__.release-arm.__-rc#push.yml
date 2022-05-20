@@ -1,11 +1,9 @@
-name: "[release(buildx)] image : official"
+name: "[release] image : rc"
 
 on:
-  pull_request:
+  push:
     branches:
-      - main
-    types:
-      - closed
+      - 'images/*/release-arm/*-rc'   # - 'images/*/release-arm/*-rc*' # rc 以下は workflow 内で生成する。
 
 env:
   REGISTRY   : ghcr.io
@@ -13,38 +11,32 @@ env:
 jobs:
   build-and-push-image:
     name    : Build => Push to ghcr.io
-    # if 文で正規表現 ( 'images/*/buildx/*-rc' ) が使えない為、やや緩めの判定で妥協。
-    if      : |
-      github.event.pull_request.merged == true && 
-      startsWith(github.event.pull_request.head.ref, 'images/') &&
-      contains(github.event.pull_request.head.ref, '/buildx/') &&
-      endsWith(github.event.pull_request.head.ref, '-rc')
     runs-on : ubuntu-latest
     steps   :
       - name  : env
         env   :
           GITHUB_CONTEXT : ${{ toJson(github) }}
-          MERGED_BRANCH  : ${{ github.event.pull_request.head.ref }}
+          GITHUB_REF     : ${{ github.ref }}
           REPO_OWNER     : ${{ github.repository_owner }}
           REPO_NAME      : ${{ github.event.repository.name }}
           REGISTRY       : ${{ env.REGISTRY }}
         run   : |
           echo "GITHUB_CONTEXT : $GITHUB_CONTEXT"
 
-          # datetime=$(TZ=UTC-9 date +'%Y-%m-%d.%H-%M-%S')
-          # echo "datetime : $datetime"
+          datetime=$(TZ=UTC-9 date +'%Y-%m-%d.%H-%M-%S')
+          echo "datetime : $datetime"
 
-          branch="${MERGED_BRANCH}"
-          echo "branch : $branch"
+          branch="${GITHUB_REF/refs\/heads\//}"
+          echo "branch : $$branch"
 
           image="$(cut -d '/' -f 2 <<< $branch)"
           echo "image : $image"
           
-          version_rc="${branch/images\/$image\/buildx\//}"
-          version="${version_rc%-*}"
+          version_rc="${branch/images\/$image\/release-arm\//}"
+          version="${version_rc}.${datetime}"
           echo "version_rc : $version_rc"
           echo "version    : $version"
-
+          
           repo_owner_lowercase=${REPO_OWNER,,}
           repo_name_lowercase=${REPO_NAME,,}
 
@@ -97,32 +89,11 @@ jobs:
         with  :
           context : ./images/${{ env.IMAGE_NAME }}
           # file    : Dockerfile
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/arm64
           push    : true
           tags    : ${{ env.IMAGE_TAG }}
 
-      - name  : Create Release
-        uses  : actions/create-release@v1
-        env   :
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with  :
-          tag_name     :         ${{ env.GIT_TAG }}
-          release_name : release ${{ env.GIT_TAG }}
-          body         : |
-            ## CHANGELOG
-            - commits url : ${{ github.event.pull_request.commits_url }}
-          draft        : false
-          prerelease   : false
-
-
-#on:
-#  release:
-#    types:
-#      - published
-#
-#jobs:
-#   build-and-push-image:
-#     name    : Build => Push to ghcr.io
-#     runs-on : ubuntu-latest
-#     steps   :
-
+      - name  : Tag branch
+        run   : |
+          git tag         ${{ env.GIT_TAG }}
+          git push origin ${{ env.GIT_TAG }}
