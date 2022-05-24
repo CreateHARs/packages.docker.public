@@ -1,4 +1,4 @@
-name: "[release(buildx)] image : official"
+name: "[release] image : official"
 
 on:
   pull_request:
@@ -13,11 +13,11 @@ env:
 jobs:
   build-and-push-image:
     name    : Build => Push to ghcr.io
-    # if 文で正規表現 ( 'images/*/buildx/*-rc' ) が使えない為、やや緩めの判定で妥協。
+    # if 文で正規表現 ( 'images/*/release-arm/*-rc' ) が使えない為、やや緩めの判定で妥協。
     if      : |
       github.event.pull_request.merged == true && 
       startsWith(github.event.pull_request.head.ref, 'images/') &&
-      contains(github.event.pull_request.head.ref, '/buildx/') &&
+      contains(github.event.pull_request.head.ref, '/release-arm/') &&
       endsWith(github.event.pull_request.head.ref, '-rc')
     runs-on : ubuntu-latest
     steps   :
@@ -40,7 +40,7 @@ jobs:
           image="$(cut -d '/' -f 2 <<< $branch)"
           echo "image : $image"
           
-          version_rc="${branch/images\/$image\/buildx\//}"
+          version_rc="${branch/images\/$image\/release-arm\//}"
           version="${version_rc%-*}"
           echo "version_rc : $version_rc"
           echo "version    : $version"
@@ -97,7 +97,7 @@ jobs:
         with  :
           context : ./images/${{ env.IMAGE_NAME }}
           # file    : Dockerfile
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/arm64
           push    : true
           tags    : ${{ env.IMAGE_TAG }}
 
