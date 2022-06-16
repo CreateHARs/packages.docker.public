@@ -8,14 +8,17 @@ RUN cp /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
 #RUN yum install cronie-anacron -y
 RUN yum install cronie-noanacron -y
 
-RUN yum -y install epel-release
-RUN yum -y install jq
+RUN rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm \
+    && yum -y install jq
 
 RUN yum localinstall -y https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm
 RUN yum-config-manager --disable mysql57-community
 RUN yum-config-manager --enable mysql80-community
 RUN rpm --import https://repo.mysql.com/RPM-GPG-KEY-mysql-2022
 RUN yum install -y mysql-community-client
+
+RUN yum clean all \
+    && rm -rf /var/cache/yum
 
 ENV CRONTAB_FILE_PATH "/workdir/crontabs/default.crontab"
 
