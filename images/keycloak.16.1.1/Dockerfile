@@ -10,6 +10,7 @@ ENV LAUNCH_JBOSS_IN_BACKGROUND 1
 ENV PROXY_ADDRESS_FORWARDING false
 ENV JBOSS_HOME /opt/jboss/keycloak
 ENV LANG en_US.UTF-8
+ENV TZ Asia/Tokyo
 
 ARG GIT_REPO
 ARG GIT_BRANCH
@@ -17,7 +18,11 @@ ARG KEYCLOAK_DIST=https://github.com/keycloak/keycloak/releases/download/$KEYCLO
 
 USER root
 
-RUN microdnf update -y && microdnf install -y glibc-langpack-en gzip hostname java-11-openjdk-headless openssl tar which && microdnf clean all
+RUN microdnf update -y && \
+    microdnf install -y glibc-langpack-en gzip hostname java-11-openjdk-headless openssl tar which && \
+    cp /usr/share/zoneinfo/${TZ} /etc/localtime && \
+    echo ${TZ} > /etc/timezone && \
+    microdnf clean all
 
 ADD tools /opt/jboss/tools
 RUN /opt/jboss/tools/build-keycloak.sh
