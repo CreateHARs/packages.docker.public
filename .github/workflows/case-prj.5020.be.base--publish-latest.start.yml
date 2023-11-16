@@ -8,7 +8,6 @@ concurrency:
 
 jobs:
   call-release-flow:
-    needs: prepare-values
     uses: ./.github/workflows/callable.release-to-ghcr.public.yml
     with:
       root-directory: ./cases.prj.5020.be.base
