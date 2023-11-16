@@ -1,0 +1,12 @@
+name: "[Case:prj.5020.be.base] Publish Branch - Start"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  prepare-values:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: "[JOB] Start"
+        run:  echo "start."

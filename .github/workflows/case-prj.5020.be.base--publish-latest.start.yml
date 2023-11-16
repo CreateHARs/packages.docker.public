@@ -1,0 +1,16 @@
+name: "[Case:prj.5020.be.base] Publish Latest - Start"
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  "排他制御"
+
+jobs:
+  call-release-flow:
+    needs: prepare-values
+    uses: ./.github/workflows/_callable.release-to-ghcr.public.yml
+    with:
+      root-directory: ./cases.prj.5020.be.base
+      release-branch: main
+      release-name:   prj.5020.be.base

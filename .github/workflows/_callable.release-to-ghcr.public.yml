@@ -1,0 +1,111 @@
+name: "Reusable Release Flow"
+
+on:
+  workflow_call:
+    inputs:
+      root-directory:
+        type:     string
+        required: true
+      release-branch:
+        type:     string
+        required: true
+      release-platform:
+        type:     string
+        required: false
+        default:  linux/amd64,linux/arm64
+      item-name:
+        type:     string
+        required: true
+      item-version:
+        type:     string
+        required: false
+        default:  auto
+
+#defaults:
+#  run:
+#    working-directory: ./cases.prj.5020.be.base
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: "[JOB] Start"
+        run:  echo "start."
+      -
+        name: "[STEP] Setup - Checkout Repository"
+        uses: actions/checkout@v4
+        ref:
+      -
+        name: "[STEP] Setup - Build X Option For ARM (QEMU)"
+        uses: docker/setup-qemu-action@v3
+      -
+        name: "[STEP] Setup - Build X"
+        uses: docker/setup-buildx-action@v3
+      -
+        name: "[STEP] Setup - Create Version (auto)"
+        if:  ${{ inputs.item-version == 'auto' }}
+        run   : |
+          VERSION=$(TZ=UTC-9 date +'%Y-%m-%d.%H-%M-%S') # ${{ github.sha }}
+          if [[ $RELEASE_BRANCH != "main" ]] 
+            RELEASE_BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+            VERSION_PREFIX=$(echo ${RELEASE_BRANCH} | sed "s/\//./g" | sed "s/\#/./g" | sed "s/\$/./g")
+            VERSION="rc.${VERSION_PREFIX}.${VERSION}"
+          fi
+          echo "RELEASE_VERSION=$VERSION" >> $GITHUB_ENV
+      -
+        name: "[STEP] Setup - Create Version (input)"
+        if:  ${{ inputs.item-version != 'auto' }}
+        run   : |
+          echo "RELEASE_VERSION=${{ inputs.item-version }}" >> $GITHUB_ENV
+      -
+        name: "[STEP] Setup - Create Tag"
+        env:
+          REGISTRY:   ghcr.io
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME:  ${{ github.event.repository.name }}
+        run   : |
+          OWNER=${REPO_OWNER,,} # to lower case
+          REPO=${REPO_NAME,,}   # to lower case
+
+          DOCKER_TAG="${REGISTRY}/${OWNER}/${REPO}/${{ inputs.item-name }}:${{ env.RELEASE_VERSION }}"
+          SOURCE_TAG="${{ inputs.item-name }}@${{ env.RELEASE_VERSION }}"
+
+          echo "DOCKER_TAG=$DOCKER_TAG" >> $GITHUB_ENV
+          echo "SOURCE_TAG=$SOURCE_TAG" >> $GITHUB_ENV
+      -
+        name: "[STEP] Build And Push Image - to 'ghcr.io'"
+        uses: docker/build-push-action@v5
+        with:
+          context:    ${{ inputs.root-directory }} # working-directory の設定があってもこれがないとダメ。
+          platforms:  ${{ inputs.release-platform }}
+          tags:       ${{ env.DOCKER_TAG }}
+          #          file: ./prj.5020.app.baas.misimaya.Dockerfile  # buildx failed with: ERROR: failed to solve: failed to read dockerfile: open prj.5020.app.baas.misimaya.Dockerfile: no such file or directory
+          push:       true
+          no-cache:   true
+          cache-from: type=gha
+          cache-to:   type=gha,mode=max
+
+
+#  create-git-history:
+##    # version-up からの直列実行 & version-up が skip された場合も動くようにしておく
+##    if: ${{ !failure() }}
+#    needs:   build-and-publish
+#    runs-on: ubuntu-latest
+#    steps:
+#      -
+#        name: "[JOB] Start"
+#        run:  echo "start."
+#      -
+#        name  : "[STEP] Create Git Release"
+#        uses  : actions/create-release@v1
+#        env   :
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with  :
+#          tag_name     :         ${{ env.GIT_TAG }}
+#          release_name : release ${{ env.GIT_TAG }}
+#          body         : |
+#            ## CHANGELOG
+#            - commits url : ${{ github.event.pull_request.commits_url }}
+#          draft        : false
+#          prerelease   : false
