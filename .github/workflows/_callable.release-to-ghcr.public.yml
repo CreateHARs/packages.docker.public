@@ -35,7 +35,8 @@ jobs:
       -
         name: "[STEP] Setup - Checkout Repository"
         uses: actions/checkout@v4
-        ref:  ${{ inputs.release-branch }}
+        with:
+          ref:  ${{ inputs.release-branch }}
       -
         name: "[STEP] Setup - Build X Option For ARM (QEMU)"
         uses: docker/setup-qemu-action@v3
