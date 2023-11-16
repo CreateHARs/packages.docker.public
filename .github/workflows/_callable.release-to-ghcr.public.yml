@@ -75,18 +75,18 @@ jobs:
 
           echo "DOCKER_TAG=$DOCKER_TAG" >> $GITHUB_ENV
           echo "SOURCE_TAG=$SOURCE_TAG" >> $GITHUB_ENV
-#      -
-#        name: "[STEP] Build And Push Image - to 'ghcr.io'"
-#        uses: docker/build-push-action@v5
-#        with:
-#          context:    ${{ inputs.root-directory }} # working-directory の設定があってもこれがないとダメ。
-#          platforms:  ${{ inputs.release-platform }}
-#          tags:       ${{ env.DOCKER_TAG }}
-#          #          file: ./prj.5020.app.baas.misimaya.Dockerfile  # buildx failed with: ERROR: failed to solve: failed to read dockerfile: open prj.5020.app.baas.misimaya.Dockerfile: no such file or directory
-#          push:       true
-#          no-cache:   true
-#          cache-from: type=gha
-#          cache-to:   type=gha,mode=max
+      -
+        name: "[STEP] Build And Push Image - to 'ghcr.io'"
+        uses: docker/build-push-action@v5
+        with:
+          context:    ${{ inputs.root-directory }} # working-directory の設定があってもこれがないとダメ。
+          platforms:  ${{ inputs.release-platform }}
+          tags:       ${{ env.DOCKER_TAG }}
+          #          file: ./prj.5020.app.baas.misimaya.Dockerfile  # buildx failed with: ERROR: failed to solve: failed to read dockerfile: open prj.5020.app.baas.misimaya.Dockerfile: no such file or directory
+          push:       true
+          no-cache:   true
+          cache-from: type=gha
+          cache-to:   type=gha,mode=max
 
 
 #  create-git-history:
