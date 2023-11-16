@@ -10,6 +10,6 @@ jobs:
   call-release-flow:
     uses: ./.github/workflows/_callable.release-to-ghcr.public.yml
     with:
-      root-directory: ./cases.prj.5020.be.base
+      root-directory: ./cases/prj.5020.be.base
       release-branch: main
       item-name:      prj.5020.be.base
