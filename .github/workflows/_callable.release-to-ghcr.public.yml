@@ -21,6 +21,9 @@ on:
         required: false
         default:  auto
 
+env:
+  DOCKER_REGISTRY: ghcr.io
+
 #defaults:
 #  run:
 #    working-directory: ./cases.prj.5020.be.base
@@ -63,18 +66,24 @@ jobs:
       -
         name: "[STEP] Setup - Create Tag"
         env:
-          REGISTRY:   ghcr.io
           REPO_OWNER: ${{ github.repository_owner }}
           REPO_NAME:  ${{ github.event.repository.name }}
         run   : |
           OWNER=${REPO_OWNER,,} # to lower case
           REPO=${REPO_NAME,,}   # to lower case
 
-          DOCKER_TAG="${REGISTRY}/${OWNER}/${REPO}/${{ inputs.item-name }}:${{ env.RELEASE_VERSION }}"
+          DOCKER_TAG="${{env.DOCKER_REGISTRY}}/${OWNER}/${REPO}/${{ inputs.item-name }}:${{ env.RELEASE_VERSION }}"
           SOURCE_TAG="${{ inputs.item-name }}@${{ env.RELEASE_VERSION }}"
 
           echo "DOCKER_TAG=$DOCKER_TAG" >> $GITHUB_ENV
           echo "SOURCE_TAG=$SOURCE_TAG" >> $GITHUB_ENV
+      -
+        name  : "[STEP] Login to the Container registry"
+        uses  : docker/login-action@v3
+        with  :
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       -
         name: "[STEP] Build And Push Image - to 'ghcr.io'"
         uses: docker/build-push-action@v5
